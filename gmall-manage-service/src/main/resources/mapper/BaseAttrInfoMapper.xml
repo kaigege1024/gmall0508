@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.gmall.manage.mapper.BaseAttrInfoMapper">
+    <select id="selectAttrInfoByValueId" resultMap="selectAttrInfoByValueIdMap">
+        SELECT attr.id attr_id,attr.*,val.id val_id,val.*
+        FROM base_attr_info attr,base_attr_value val
+        WHERE attr.id = val.attr_id
+        AND val.id IN(${join})
+
+    </select>
+    <resultMap id="selectAttrInfoByValueIdMap" type="com.atguigu.gmall.bean.BaseAttrInfo">
+        <id property="id" column="attr_id"></id>
+        <result property="attrName" column="attr_name"></result>
+        <collection property="attrValueList" ofType="com.atguigu.gmall.bean.BaseAttrValue">
+            <id property="id" column="val_id"></id>
+            <result property="valueName" column="value_name"></result>
+        </collection>
+    </resultMap>
+</mapper>
