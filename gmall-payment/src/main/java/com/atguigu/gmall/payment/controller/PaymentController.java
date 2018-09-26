@@ -54,21 +54,8 @@ public class PaymentController {
         String callBack = request.getQueryString();
         String tradeNo = request.getParameter("trade_no");
 
-        PaymentInfo paymentInfo = new PaymentInfo();
-
-        paymentInfo.setOutTradeNo(outTradeNo);
-
-        paymentInfo.setAlipayTradeNo(tradeNo);
-
-        paymentInfo.setCallbackTime(new Date());
-
-        paymentInfo.setPaymentStatus("已支付");
-
-        paymentInfo.setCallbackContent(callBack);
-        //更新paymentInfo表
-        paymentService.updatePaymentInfoByOutTradeNo(paymentInfo);
-        //创建一个队列消息
-        paymentService.sendPaymentResult(outTradeNo,tradeNo);
+        //支付成功返回以后修改paymentInfo表，给mq发送一个队列消息，通知订单服务
+        paymentService.tradeSuccessUpdatePaymentInfo(outTradeNo,tradeNo,callBack);
 
 
         return  "finish";
@@ -133,6 +120,7 @@ public class PaymentController {
 
         paymentService.savePaymentInfo(paymentInfo);
 
+        paymentService. sendDelayPaymentResult(paymentInfo.getOutTradeNo(),5);
 
         return form;
     }
