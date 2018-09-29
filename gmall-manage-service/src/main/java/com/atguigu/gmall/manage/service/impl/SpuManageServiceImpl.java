@@ -11,6 +11,7 @@ import java.util.List;
 
 @Service
 public class SpuManageServiceImpl implements SpuManageService {
+
     @Autowired
     SpuInfoMapper spuInfoMapper;
     @Autowired

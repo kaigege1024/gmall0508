@@ -2,6 +2,7 @@ package com.atguigu.gmall.config;
 
 import com.atguigu.gmall.annotation.LoginRequire;
 import com.atguigu.gmall.util.CookieUtil;
+import com.atguigu.gmall.util.GetIpUtil;
 import com.atguigu.gmall.util.HttpClientUtil;
 import com.atguigu.gmall.util.JwtUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -54,13 +55,13 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
 
 
-            String ip = getMyIpFormRequest(request);
+            String ip = GetIpUtil.getMyIpFormRequest(request);
 
             String url = "http://passport.gmall.com:8085/verify?token="+token+"&ip="+ip;
 
             String success = HttpClientUtil.doGet(url);
 
-            if (success.equals("success")){
+            if ("success".equals(success)){
 
                 CookieUtil.setCookie(request,response,"oldToken",token,1000*60*60*24,true);
 
@@ -80,17 +81,6 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
             return false;
         }
 
-    }
-
-
-    private String getMyIpFormRequest(HttpServletRequest request) {
-
-        String ip = request.getRemoteAddr();
-        if (StringUtils.isBlank(ip)){
-
-            ip = request.getHeader("x-forwarded-for");
-        }
-        return ip;
     }
 
 }

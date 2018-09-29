@@ -13,4 +13,6 @@ public interface OrderService {
     OrderInfo getOrderInfoByTradeNo(String outTradeNo);
 
     void updateOrderInfo(OrderInfo orderInfo);
+
+    void sendOrderResultQueue(OrderInfo infoByTradeNo);
 }

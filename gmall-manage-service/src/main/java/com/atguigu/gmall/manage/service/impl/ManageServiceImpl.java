@@ -152,7 +152,13 @@ public class ManageServiceImpl implements ManageService {
     @Override
     public List<BaseAttrInfo> getAttrInfoByValueId(String join) {
 
-        List<BaseAttrInfo> baseAttrInfos =  baseAttrInfoMapper.selectAttrInfoByValueId(join);
+        List<BaseAttrInfo> baseAttrInfos = null;
+
+        if (StringUtils.isNotBlank(join)){
+
+             baseAttrInfos =  baseAttrInfoMapper.selectAttrInfoByValueId(join);
+        }
+
 
         return baseAttrInfos;
     }

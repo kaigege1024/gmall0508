@@ -66,11 +66,12 @@ public class passportController {
         token = JwtUtil.encode("atguigu0508", map, ip);
 
         //合并购物车
+
+
         String cookieValue = CookieUtil.getCookieValue(request, "listCartCookie", true);
 
-        cartService.combineCart(JSON.parseArray(cookieValue,CartInfo.class),userInfoLogin.getId());
 
-        cartService.flushCartInfoCache(userInfoLogin.getId());
+        cartService.sendLoginSuccess(cookieValue,userInfoLogin.getId());
 
         CookieUtil.deleteCookie(request,response,"listCartCookie");
 

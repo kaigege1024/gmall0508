@@ -11,7 +11,9 @@ import com.atguigu.gmall.service.CartService;
 import com.atguigu.gmall.service.OrderService;
 import com.atguigu.gmall.service.SkuManageService;
 import com.atguigu.gmall.service.UserAddressService;
+import com.atguigu.gmall.util.HttpClientUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,7 @@ public class OrderController {
 
     @Reference
     SkuManageService skuManageService;
+
 
     /**
      * 提交订单的方法
@@ -96,7 +99,15 @@ public class OrderController {
                     orderDetail.setSkuName(cartInfo.getSkuName());
                     orderDetail.setSkuId(cartInfo.getSkuId());
                     //验库存
-                    orderDetail.setHasStock("1");
+                    String url = "http://www.gware.com:9001/hasStock?skuId="+cartInfo.getSkuId()+"&num="+cartInfo.getSkuNum();
+                    String s1 = HttpClientUtil.doGet(url);
+                    if ("1".equals(s1)){
+                        orderDetail.setHasStock(s1);
+                    }else {
+                        //商品库存不够
+                        return "err";
+                    }
+
                     //验价格
                     SkuInfo skuInfo = skuManageService.getSkuInfoById(cartInfo.getSkuId());
                     if (skuInfo.getPrice().compareTo(cartInfo.getSkuPrice())==0){

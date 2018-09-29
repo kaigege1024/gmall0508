@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 @Component
@@ -50,6 +49,10 @@ public class OrderPaymentResultListener {
             orderInfo.setExpectDeliveryTime(calendar.getTime());
 
             orderService.updateOrderInfo(orderInfo);
+
+            OrderInfo infoByTradeNo = orderService.getOrderInfoByTradeNo(outTradeNo);
+
+            orderService.sendOrderResultQueue(infoByTradeNo);
 
         }
     }

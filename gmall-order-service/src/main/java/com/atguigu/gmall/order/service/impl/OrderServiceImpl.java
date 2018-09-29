@@ -1,17 +1,21 @@
 package com.atguigu.gmall.order.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.bean.OrderDetail;
 import com.atguigu.gmall.bean.OrderInfo;
 import com.atguigu.gmall.order.mapper.OrderDetailMapper;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.service.OrderService;
+import com.atguigu.gmall.util.ActiveMQUtil;
 import com.atguigu.gmall.util.RedisUtil;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.jms.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +31,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     RedisUtil redisUtil;
 
+    @Autowired
+    ActiveMQUtil activeMQUtil;
 
+    /**
+     * 客户提交订单，保存订单
+     * @param orderInfo
+     */
     @Override
     public void saveOrderInfo(OrderInfo orderInfo) {
 
@@ -47,6 +57,11 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    /**
+     * 随机生成一个交易码
+     * @param userId
+     * @return
+     */
     @Override
     public String genTradeCode(String userId) {
 
@@ -61,6 +76,12 @@ public class OrderServiceImpl implements OrderService {
         return uuid;
     }
 
+    /**
+     * 验证交易码是否可用，使用之后从缓存直接删除
+     * @param userId
+     * @param tradeCode
+     * @return
+     */
     @Override
     public boolean checkTradeCode(String userId, String tradeCode) {
 
@@ -111,6 +132,10 @@ public class OrderServiceImpl implements OrderService {
         return orderInfo;
     }
 
+    /**
+     * 支付成功，修改订单信息
+     * @param orderInfo
+     */
     @Override
     public void updateOrderInfo(OrderInfo orderInfo) {
 
@@ -119,6 +144,35 @@ public class OrderServiceImpl implements OrderService {
         example.createCriteria().andEqualTo("outTradeNo",orderInfo.getOutTradeNo());
 
         orderInfoMapper.updateByExampleSelective(orderInfo,example);
+
+
+    }
+
+    /**
+     * 向MQ发送一个队列消息，通知库存系统
+     * @param infoByTradeNo
+     */
+    @Override
+    public void sendOrderResultQueue(OrderInfo infoByTradeNo) {
+
+        Connection connection = activeMQUtil.getConnection();
+
+        try {
+            connection.start();
+            Session session = connection.createSession(true, Session.SESSION_TRANSACTED);
+            Queue resultQueue = session.createQueue("ORDER_RESULT_QUEUE");
+            TextMessage textMessage = new ActiveMQTextMessage();
+            textMessage.setText(JSON.toJSONString(infoByTradeNo));
+            MessageProducer producer = session.createProducer(resultQueue);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+            producer.send(textMessage);
+            session.commit();
+            producer.close();
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
 
 
     }

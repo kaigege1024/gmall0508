@@ -18,13 +18,16 @@ public class RedisConfig {
     @Value("${spring.redis.database:0}")
     private int database;
 
+    @Value("${spring.redis.password:0}")
+    private String password;
+
     @Bean
     public RedisUtil getRedisUtil(){
         if(host.equals("disabled")){
             return null;
         }
         RedisUtil redisUtil=new RedisUtil();
-        redisUtil.initPool(host,port,database);
+        redisUtil.initPool(host,port,database,password);
         return redisUtil;
     }
 

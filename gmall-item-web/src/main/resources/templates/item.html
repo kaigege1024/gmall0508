@@ -20,45 +20,17 @@
 								<ol id="beijing">
 									<li style="background: red;"><a href="javascript:;" style="color: white;">北京</a></li>
 									<li><a href="javascript:;">上海</a></li>
-									<li><a href="javascript:;">天津</a></li>
-									<li><a href="javascript:;">重庆</a></li>
-									<li><a href="javascript:;">河北</a></li>
-									<li><a href="javascript:;">山西</a></li>
-									<li><a href="javascript:;">河南</a></li>
-									<li><a href="javascript:;">辽宁</a></li>
-									<li><a href="javascript:;">吉林</a></li>
-									<li><a href="javascript:;">黑龙江</a></li>
-									<li><a href="javascript:;">内蒙古</a></li>
-									<li><a href="javascript:;">江苏</a></li>
-									<li><a href="javascript:;">山东</a></li>
-									<li><a href="javascript:;">安徽</a></li>
-									<li><a href="javascript:;">浙江</a></li>
-									<li><a href="javascript:;">福建</a></li>
-									<li><a href="javascript:;">湖北</a></li>
-									<li><a href="javascript:;">湖南</a></li>
-									<li><a href="javascript:;">广东</a></li>
-									<li><a href="javascript:;">广西</a></li>
-									<li><a href="javascript:;">江西</a></li>
-									<li><a href="javascript:;">四川</a></li>
-									<li><a href="javascript:;">海南</a></li>
-									<li><a href="javascript:;">贵州</a></li>
-									<li><a href="javascript:;">云南</a></li>
-									<li><a href="javascript:;">西藏</a></li>
-									<li><a href="javascript:;">陕西</a></li>
-									<li><a href="javascript:;">甘肃</a></li>
-									<li><a href="javascript:;">青海</a></li>
-									<li><a href="javascript:;">宁夏</a></li>
-									<li><a href="javascript:;">新疆</a></li>
-									<li><a href="javascript:;">港澳</a></li>
-									<li><a href="javascript:;">台湾</a></li>
-									<li><a href="javascript:;">钓鱼岛</a></li>
-									<li><a href="javascript:;">海外</a></li>
 								</ol>
 							</li>
 						</ul>
 						<ul class="header_ul_right">
-							<li style="border: 0;"><a href="../登录页面\index.html" class="aa">你好，请登录</a></li>
-							<li><a href="../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+							<div th:if="${nickName} == null">
+								<li style="border: 0;"><a id="itemLogin"  class="aa">你好，请登录</a ></li>
+								<li><a href="../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+							</div>
+							<div th:if="${nickName} != null">
+								<li th:text="'你好，'+${nickName}"> </li>
+							</div>
 							<li><a href="javascript:;" class="aa">我的订单</a> |</li>
  
 						</ul>
@@ -116,16 +88,6 @@
 						<div class="box-lh-one">
 							<ul>
 								<li th:each="skuImage:${skuInfo?.skuImageList}">
-								 		<img th:src="${skuImage.imgUrl}"/>
-<!--								<li><img src="/img/59ded62eN64a9784c.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded626N7c4cb0a3.jpg" /></li>
-								<li><img src="/img/59ded626Ne3c69b70.jpg" /></li>
-								<li><img src="/img/59ded62dN7e28abc5 (1).jpg" /></li>
-								<li><img src="/img/59ded62cN6e9ac17c.jpg" /></li>
-								<li><img src="/img/59ded620Nfc0ab489.jpg" /></li>
-								<li><img src="/img/59ded60eN3110f3a8.jpg" /></li>
-								<li><img src="/img/59ded62dNfed003a8.jpg" /></li>-->
 								</li>
 							</ul>
 						</div>
@@ -200,7 +162,7 @@
 
 								</li>
 								<li>
-									<span>无货</span>， 此商品暂时售完
+									<span id="stockText" th:text="(${stock}==1)?'有货':'无货'">无货</span>
 								</li>
  
 							</ul>
@@ -233,37 +195,16 @@
 									</dd>
 								</dl>
 							</div>
-<!--							<div class="box-attr-2 clear">
-								<dl>
-									<dt>选择版本</dt>
-									<dd>
-										<a href="#">标准版</a>
-									</dd>
-									<dd>
-										<a href="#">套装版</a>
-									</dd>
-								</dl>
-							</div>
 
-							<div class="box-attr-2 clear">
-								<dl>
-									<dt>选择内存</dt>
-									<dd>
-										<a href="#">64GB</a>
-									</dd>
-									<dd>
-										<a href="#">128GB</a>
-									</dd>
-								</dl>
-							</div>-->
 							<br/>
 						</div>
-
 						<div class="box-btns clear">
 							<div class="box-btns-one">
 								<form id="itemForm" action="http://cart.gmall.com:8084/addToCart" method="post">
-									<input type="text" name="num" id=""  value="1"/>
+									<input type="text" name="num" id="skuNum"  value="1"/>
 									<input type="hidden" name="skuId"  th:value="${skuInfo?.id}" />
+
+
 
 									<div class="box-btns-one1">
 
@@ -1046,7 +987,30 @@ function switchSkuId() {
 	}
 
 }
+	var text = $("#stockText").text();
+	if (text=="无货"){
+        $("#cartBtn").attr("class","box-btns-two-off");
+	}
+	$("#jia").click(function () {
 
-	</script>
+	  var num = $("#skuNum").val();
+
+        $("#skuNum").val(parseInt(num)+parseInt(1));
+    })
+	$("#jian").click(function () {
+
+		var num = $("#skuNum").val();
+		if (num >1){
+            $("#skuNum").val(num-1);
+		}
+
+	})
+	$("#itemLogin").click(function () {
+
+	  var  url = document.location.href;
+
+	    window.location.href="http://passport.gmall.com:8085/index?originUrl="+url;
+    })
+</script>
 
 </html>

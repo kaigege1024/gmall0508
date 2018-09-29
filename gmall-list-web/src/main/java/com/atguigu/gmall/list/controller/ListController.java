@@ -72,8 +72,6 @@ public class ListController {
             }
         }
 
-
-
         String urlParam = getUrlParam(skuLsParam);
 
         model.addAttribute("attrList",baseAttrInfos);

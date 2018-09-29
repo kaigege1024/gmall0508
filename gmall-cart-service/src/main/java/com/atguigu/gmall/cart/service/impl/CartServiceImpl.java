@@ -6,15 +6,20 @@ import com.atguigu.gmall.bean.CartInfo;
 import com.atguigu.gmall.cart.mapper.CartInfoMapper;
 import com.atguigu.gmall.constant.CartCacheConst;
 import com.atguigu.gmall.service.CartService;
+import com.atguigu.gmall.util.ActiveMQUtil;
 import com.atguigu.gmall.util.RedisUtil;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+import org.apache.activemq.command.ActiveMQMapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.jms.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -24,6 +29,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    ActiveMQUtil activeMQUtil;
 
 
     @Override
@@ -155,7 +163,7 @@ public class CartServiceImpl implements CartService {
             }
 
         }
-
+        flushCartInfoCache(userId);
     }
 
     @Override
@@ -164,6 +172,45 @@ public class CartServiceImpl implements CartService {
         cartInfoMapper.deleteCarInfoById(join);
 
         flushCartInfoCache(userId);
+
+
+    }
+
+    @Override
+    public void sendLoginSuccess(String cookieValue,String userId) {
+
+        Connection connection = null;
+
+        try {
+            connection = activeMQUtil.getConnection();
+            connection.start();
+
+            Session session = connection.createSession(true, Session.SESSION_TRANSACTED);
+            MapMessage mapMessage = new ActiveMQMapMessage();
+
+            mapMessage.setString("userId",userId);
+
+            mapMessage.setString("cookieValue",cookieValue);
+
+            Queue queue = session.createQueue("CART_CHECK_QUEUE");
+
+            MessageProducer producer = session.createProducer(queue);
+
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+
+            producer.send(mapMessage);
+
+            session.commit();
+
+            producer.close();
+
+            session.close();
+
+            connection.close();
+
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
 
 
     }
