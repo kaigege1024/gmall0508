@@ -27,7 +27,9 @@ public class ListController {
     @RequestMapping("list.html")
     public String list(SkuLsParam skuLsParam, Model model){
 
-    List<SkuLsInfo> skuLsInfous =  listService.getSkuLsInfoList(skuLsParam);
+        SkuLsResult skuLsResult = listService.getSkuLsInfoList(skuLsParam);
+
+        List<SkuLsInfo> skuLsInfous = skuLsResult.getSkuLsInfoList();
 
         HashSet<String> strings = new HashSet<>();
         for (SkuLsInfo skuLsInfo : skuLsInfous) {
@@ -73,6 +75,12 @@ public class ListController {
         }
 
         String urlParam = getUrlParam(skuLsParam);
+
+        long totalPages = skuLsResult.getTotalPages();
+
+        model.addAttribute("totalPages",totalPages);
+
+        model.addAttribute("pageNo",skuLsParam.getPageNo());
 
         model.addAttribute("attrList",baseAttrInfos);
 

@@ -5,6 +5,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.atguigu.gmall.bean.SkuInfo;
 import com.atguigu.gmall.bean.SkuLsInfo;
 import com.atguigu.gmall.bean.SkuLsParam;
+import com.atguigu.gmall.bean.SkuLsResult;
 import com.atguigu.gmall.constant.SearchConst;
 import com.atguigu.gmall.service.ListService;
 import com.atguigu.gmall.service.SkuManageService;
@@ -36,7 +37,10 @@ public class ListServiceImpl implements ListService {
     SkuManageService skuManageService;
 
     @Override
-    public List<SkuLsInfo> getSkuLsInfoList(SkuLsParam skuLsParam) {
+    public SkuLsResult getSkuLsInfoList(SkuLsParam skuLsParam) {
+
+
+        SkuLsResult skuLsResult = new SkuLsResult();
 
         String catalog3Id = skuLsParam.getCatalog3Id();
 
@@ -63,11 +67,17 @@ public class ListServiceImpl implements ListService {
                 }
                 skuLsInfos.add(source);
             }
+            skuLsResult.setSkuLsInfoList(skuLsInfos);
+            long total = execute.getTotal();
+            skuLsResult.setTotal((int)total);
+
+        long totalPage = (execute.getTotal() + skuLsParam.getPageSize() - 1)/skuLsParam.getPageSize();
+        skuLsResult.setTotalPages(totalPage);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return skuLsInfos;
+        return skuLsResult;
     }
 
     public String getMyDsl(SkuLsParam skuLsParam) {
@@ -110,8 +120,9 @@ public class ListServiceImpl implements ListService {
         highlightBuilder.postTags("</span>");
         searchSourceBuilder.highlight(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
-        searchSourceBuilder.from(0);
-        searchSourceBuilder.size(100);
+        int from =(skuLsParam.getPageNo()-1)*skuLsParam.getPageSize();
+        searchSourceBuilder.from(from);
+        searchSourceBuilder.size(skuLsParam.getPageSize());
         System.err.println(searchSourceBuilder);
         return searchSourceBuilder.toString();
     }

@@ -210,115 +210,7 @@
                                     Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
                                 </a>
                         </div>
-                         <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/57d0d400nfd249af4.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥5199.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                    Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
-                                </a>
-                        </div>
-					  <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/57d0d400nfd249af4.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥5199.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                    Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
-                                </a>
-                        </div>
-						 <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/57d0d400nfd249af4.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥5199.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                    Apple iPhone 7 Plus (A1661) 32G 黑色 移动联通电信4G手机
-                                </a>
-                        </div>
-
-					     <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/58d1d078N20e18b62.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥6388.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                   Apple iPhone 7 Plus 128G 红色特别版 移动联通电信4G手机
-                                </a>
-                        </div>
-					   <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/58d1d078N20e18b62.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥6388.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                   Apple iPhone 7 Plus 128G 红色特别版 移动联通电信4G手机
-                                </a>
-                        </div>
-					  <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/58d1d078N20e18b62.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥6388.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                   Apple iPhone 7 Plus 128G 红色特别版 移动联通电信4G手机
-                                </a>
-                        </div>
-					  <div style="width:215px">
-                            <p class="da">
-                                <a href="#" >
-                                    <img src="/list/img/58d1d078N20e18b62.jpg" class="dim">
-                                </a>
-                            </p>
-
-                            <p class="tab_R">
-                                <span>¥6388.00</span>
-                            </p>
-
-                                <a href="#" title="" class="tab_JE">
-                                   Apple iPhone 7 Plus 128G 红色特别版 移动联通电信4G手机
-                                </a>
-                        </div>
                     </div>
-
-
                     <!--分页-->
                     <div class="filter_page">
                         <div class="page_wrap">
@@ -395,7 +287,37 @@
         </ul>
     </div>
 </footer>
+<script th:inline="javascript">
+    $(function () {
+        $(".page_span1").empty();
+        var totalPage = [[${totalPages}]];
+        var pageNo  = [[${pageNo }]];
+        var urlParam  = [[${urlParam }]];
 
+        var lastPage =  '<a href="/list.html?'+urlParam+'&pageNo='+(pageNo-1)+'">< 上一页</a>';
+
+        if (pageNo == 1){
+            lastPage = '<a disabled="true">上一页</a>';
+        }
+        $(".page_span1").append(lastPage);
+        for (var i = 1; i<= totalPage;i++) {
+            if (i == pageNo) {
+                $(".page_span1").append('<a style="border:0;font-size:20px;color:red;' +
+                    'background:#ff">' + i + '</a>');
+            } else if (i == 1 || i == totalPage || (i >= (pageNo - 2) && i <= (pageNo + 2))) {
+                $(".page_span1").append('<a href="/list.html?' + urlParam + '&pageNo=' + i + '">' + i + '</a>');
+            } else if ((i == (pageNo + 3) && i <= totalPage || (i == pageNo - 3) && i > 1)) {
+                $(".page_span1").append('<a style="border: 0;font-size: 20px;color: #999;background: #fff">...</a>');
+            }
+        }
+        var nextPage =  '<a href="/list.html?'+urlParam+'&pageNo='+(pageNo+1)+'">下一页 ></a>';
+        if (pageNo==totalPage||totalPage == 0){
+            nextPage="<a disabled='true'>下一页</a>";
+        }
+        $(".page_span1").append(nextPage);
+
+    })
+</script>
 
 <script src="/list/js/index.js"></script>
 <script language="JavaScript">
